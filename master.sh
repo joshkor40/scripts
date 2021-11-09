@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 #COLOR
@@ -9,8 +10,8 @@ function sleep_and_clear {
     clear
 }
 clear
-echo -e "${cy}ADDING DOCKER DAEMON CONFIGS TO USE SYSTEMD AS CGROUP DRIVER${rst}"
-echo -e
+echo "${cy}ADDING DOCKER DAEMON CONFIGS TO USE SYSTEMD AS CGROUP DRIVER${rst}"
+echo
 cat <<EOF | sudo tee /etc/docker/daemon.json
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
@@ -77,11 +78,11 @@ echo "${cy}EXECUTING JOIN COMMAND${rst}"
     echo
     sudo kubeadm init --apiserver-advertise-address=172.31.34.60 \
     --apiserver-cert-extra-sans=172.31.34.60  \
-    --pod-network-cidr=172.31.0.0/16
+    --pod-network-cidr=172.31.0.0/16 >/dev/null
     sleep_and_clear
 
 echo "${cy}CREATING KUBE DIRECTORY AND SETTING USER PERMISSIONS${rst}"
-    echo 
+    echo
     mkdir -p $HOME/.kube
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
     sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -99,10 +100,10 @@ echo "${cy}REMOVING AND TAINT NODES${rst}"
     echo
     kubectl taint nodes --all node-role.kubernetes.io/master-
     sleep_and_clear
-    kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
-    kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
-    curl -o kubectl-calico -O -L  "https://github.com/projectcalico/calicoctl/releases/download/v3.21.0/calicoctl" 
-    chmod +x kubectl-calico
+
+echo "${cy}INSTALLING AND APPLYING CALICO CNI..${rst}"
+    kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml >/dev/null
+    sleep_and_clear
 
 echo "${cy}USE THIS TO JOIN THE WORKER NODE TO THE MASTER NODE${rst}"
     echo
