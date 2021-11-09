@@ -23,8 +23,12 @@ cat <<EOF | sudo tee /etc/docker/daemon.json
 EOF
 sleep_and_clear
 
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
 echo "${cy}RESETING AND ENABLING DOCKER${rst}"
-    echo -e
+    echo
     sudo systemctl enable docker >/dev/null
     sudo systemctl daemon-reload >/dev/null
     sudo systemctl restart docker >/dev/null
