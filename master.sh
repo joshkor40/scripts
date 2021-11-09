@@ -77,7 +77,7 @@ echo "${cy}EXECUTING JOIN COMMAND${rst}"
     echo
     sudo kubeadm init --apiserver-advertise-address=172.31.34.60 \
     --apiserver-cert-extra-sans=172.31.34.60  \
-    --pod-network-cidr=172.31.0.0/16 >/dev/nul
+    --pod-network-cidr=172.31.0.0/16
     sleep_and_clear
 
 echo "${cy}CREATING KUBE DIRECTORY AND SETTING USER PERMISSIONS${rst}"
