@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 #COLOR
@@ -38,7 +37,6 @@ echo "${cy}RESETING KUBEADM${rst}"
 
 echo "${cy}CHECKING FOR OLD KUBE FILES AND REMOVING THEM${rst}"
     echo
-    sudo rm -dR /etc/cni/net.d
     sudo rm -f $HOME/.kube/config
     sudo rm -f /etc/kubernetes/manfests/*
     sleep_and_clear
@@ -74,11 +72,17 @@ echo "${cy}TURNING OFF SWAP${rst}"
     sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
     sleep_and_clear
 
-echo "${cy}EXECUTING JOIN COMMAND${rst}"
+echo "${cy}EXECUTING INIT COMMAND${rst}"
     echo
-    sudo kubeadm init --apiserver-advertise-address=172.31.34.60 \
-    --apiserver-cert-extra-sans=172.31.34.60  \
-    --pod-network-cidr=172.31.0.0/16 >/dev/null
+echo "${cy}BUT FIRST, I NEED SOME INFORMATION... ${rst}"
+    echo
+read -p "${cy}ENTER API SERVER ADVERTISE IP ADDRESS: ${rst}" IPADDRESS
+read -p "${cy}ENTER POD NETWORK CIDR EX 192.168.0.0/16: ${rst}" IPCIDR
+echo "${cy}COOL, THANKS... ${rst}"
+    echo
+    sudo kubeadm init --apiserver-advertise-address=${IPADDRESS} \
+    --apiserver-cert-extra-sans=${IPADDRESS}  \
+    --pod-network-cidr=${IPCIDR} >/dev/null
     sleep_and_clear
 
 echo "${cy}CREATING KUBE DIRECTORY AND SETTING USER PERMISSIONS${rst}"
@@ -102,7 +106,14 @@ echo "${cy}REMOVING AND TAINT NODES${rst}"
     sleep_and_clear
 
 echo "${cy}INSTALLING AND APPLYING CALICO CNI..${rst}"
+    echo
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml >/dev/null
+    sleep_and_clear
+
+echo "${cy}INSTALLING AND APPLYING CALICO CNI..${rst}"
+    echo
+    kubectl apply -f https://projectcontour.io/examples/kuard.yaml
+    kubectl get po,svc,ing -l app=kuard
     sleep_and_clear
 
 echo "${cy}USE THIS TO JOIN THE WORKER NODE TO THE MASTER NODE${rst}"
